@@ -1,4 +1,9 @@
-const fs = require("fs"); // file system - build-in module fs
+const fs = require("fs"); // file system - build-in module fs --> access to file system functions
 
-const hello = "Hello world";
-console.log(hello);
+const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
+console.log(textIn);
+
+const textOut = `This is what we know about the avocado: ${textIn}.\nCreated on ${Date.now()}`;
+fs.writeFileSync("./txt/output.txt", textOut);
+
+console.log("file written");
