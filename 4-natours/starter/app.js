@@ -7,6 +7,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // MIDDLEWARES
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(morgan('dev')); // 3rd party middleware
 app.use(express.json()); // add middleware - function modifying incoming request data - e.g. data from the body is added to the request object
 app.use(express.static(`${__dirname}/public`)); //serve static files
