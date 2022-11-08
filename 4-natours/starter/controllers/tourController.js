@@ -5,8 +5,6 @@ const tours = JSON.parse(
 );
 
 exports.checkID = (req, res, next, val) => {
-  console.log(`Tour id is: ${val}`);
-
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({ status: 'fail', message: 'Invalid ID' });
   }
@@ -52,14 +50,14 @@ exports.createTour = (req, res) => {
   // console.log(req.body); // need middleware
 
   const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body); // Object.assign() - create new object by merging two existing objects - does not mutate original
+  const newTour = { id: newId, ...req.body }; // Object.assign() - create new object by merging two existing objects - does not mutate original
 
   tours.push(newTour);
 
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    () => {
       res.status(201).json({
         statue: 'success',
         data: {
