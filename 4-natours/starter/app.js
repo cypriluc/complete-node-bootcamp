@@ -8,7 +8,7 @@ const app = express();
 
 // MIDDLEWARES
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev')); // 3rd party middleware
+  app.use(morgan('dev')); // 3rd party middleware - logs into console :method :url :status :response-time ms - :res[content-length]
 }
 
 app.use(express.json()); // add middleware - function modifying incoming request data - e.g. data from the body is added to the request object
