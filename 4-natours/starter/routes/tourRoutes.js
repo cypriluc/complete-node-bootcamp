@@ -7,6 +7,10 @@ const router = express.Router(); // create new router
 // router.param('id', tourController.checkID);
 
 router
+  .route('/top-5-cheap') // add custom route address - aliasing
+  .get(tourController.aliasTopTours, tourController.getAllTours); // use middleware to manipulate querystring
+
+router
   .route('/')
   .get(tourController.getAllTours)
   .post(tourController.createTour); // chain middlewares

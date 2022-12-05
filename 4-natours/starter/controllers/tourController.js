@@ -1,50 +1,26 @@
 const Tour = require('../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 /* const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`) // synchronous code can be outside callbacks - executed only once
 ); */
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
-    // BUILD QUERY
-    // 1a) Filtering
-    const queryObj = { ...req.query }; // create a shallow copy of req.query object - since ES6 destructuring
-    const excludedFields = ['page', 'sort', 'limit', 'fields']; // create a copy of all the fields that should be excluded
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // 1b) Advanced Filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // match word and replace - use regular expression wrap with '\b' for only the same word - not a part of a word, 'g' - use multiple times,
-
-    let query = Tour.find(JSON.parse(queryStr)); // find method returns a Query object - mongoose methods Query.prototype are available, methods are not possible to chain if we await the result right away
-
-    // 2) Sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' '); // get array of all sorting field names and put them together as string, but separated with space
-      console.log(sortBy);
-      query = query.sort(sortBy); // ascending order if sort=+price in query, descending if sort=-price
-      // sort('price ratingsAverage')
-    } else {
-      query = query.sort('-createdAt'); // set default sorting - from the newest date created
-    }
-
-    // 3) Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      // select('name duration price') // projecting
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v'); // excluding __v field
-    }
-
     // EXECUTE QUERY
-    const tours = await query;
-
-    // const query = Tour.find()
-    //   .where('duration')
-    //   .equals(5) // all other methods lt, lte...
-    //   .where('difficulty')
-    //   .equals('easy');
+    const features = new APIFeatures(Tour.find(), req.query) // find method returns a Query object - mongoose methods Query.prototype are available, methods are not possible to chain if we await the result right away -> await in the end
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
 
     // SEND RESPONSE
     res.status(200).json({
