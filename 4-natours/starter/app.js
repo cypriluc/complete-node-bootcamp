@@ -15,10 +15,10 @@ app.use(express.json()); // add middleware - function modifying incoming request
 app.use(express.static(`${__dirname}/public`)); //serve static files
 
 // create a middleware - applyies to each request if route is not defined
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
   console.log('Hello from the middleware 👋🏻');
   next(); // !!!!!! next must be in every middleware
-});
+}); */
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
